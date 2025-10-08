@@ -1,0 +1,53 @@
+/* Đảm bảo nội dung chính không bị che bởi fixed navbar */
+body {
+    padding-top: 70px; /* Chiều cao của Navbar cố định */
+    background-color: #f8f9fa; /* Nền xám nhạt */
+}
+
+/* Định vị Sidebar cố định trên màn hình lớn (lg trở lên) */
+.sidebar-fixed {
+    position: fixed;
+    top: 70px; /* Bắt đầu ngay dưới Navbar */
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    padding: 20px 0;
+    overflow-y: auto; /* Thêm cuộn nếu nội dung sidebar dài */
+    background-color: white;
+    border-right: 1px solid #dee2e6;
+}
+
+/* Điều chỉnh khu vực nội dung chính */
+.main-layout-container {
+    padding-left: 0; 
+}
+
+.main-content-area {
+    margin-left: 0; 
+    padding-left: 30px; 
+}
+
+/* Offset cho nội dung để nằm cạnh sidebar fixed trên desktop */
+@media (min-width: 992px) {
+    .main-content-area {
+        /* Đẩy nội dung chính sang phải bằng chiều rộng col-lg-2 (16.6666%) */
+        margin-left: calc(16.6666% + 30px); 
+        padding-left: 15px;
+    }
+}
+
+/* Tùy chỉnh nhỏ cho Sidebar Navlink */
+.sidebar-fixed .nav-link {
+    color: #495057;
+    padding: 8px 15px;
+}
+.sidebar-fixed .nav-link:hover {
+    color: #007bff;
+    background-color: #e9ecef;
+    border-radius: 4px;
+}
+
+/* Styling cho form Đăng nhập/Đăng ký */
+.auth-form input {
+    margin-bottom: 10px;
+}

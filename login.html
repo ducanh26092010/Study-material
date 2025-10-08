@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập tài khoản</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style src="login.css"></style>
+</head>
+<body class="bg-gray-100">
+
+    <div class="flex items-center justify-center min-h-screen px-4">
+        <div class="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 space-y-6">
+            
+            <!-- Header -->
+            <div class="text-center">
+                <h1 class="text-3xl font-bold text-gray-800">Chào mừng trở lại!</h1>
+                <p class="text-gray-500 mt-2">Đăng nhập để tiếp tục</p>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="login-form" class="space-y-6">
+                <!-- Email Input -->
+                <div class="relative form-input border border-gray-300 rounded-lg">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-envelope text-gray-400"></i>
+                    </div>
+                    <input type="email" id="email" name="email" placeholder="Email của bạn" class="w-full pl-10 pr-4 py-3 bg-transparent rounded-lg focus:outline-none" required>
+                </div>
+                
+                <!-- Password Input -->
+                <div class="relative form-input border border-gray-300 rounded-lg">
+                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-lock text-gray-400"></i>
+                    </div>
+                    <input type="password" id="password" name="password" placeholder="Mật khẩu" class="w-full pl-10 pr-4 py-3 bg-transparent rounded-lg focus:outline-none" required>
+                </div>
+
+                <!-- Remember Me & Forgot Password -->
+                <div class="flex items-center justify-between text-sm">
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="remember" name="remember" class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500">
+                        <label for="remember" class="text-gray-600">Ghi nhớ tôi</label>
+                    </div>
+                    <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Quên mật khẩu?</a>
+                </div>
+                
+                <!-- Message Area -->
+                <div id="message-container" class="text-center text-sm"></div>
+
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit" class="submit-btn w-full bg-blue-600 text-white font-semibold py-3 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 shadow-md">
+                        Đăng Nhập
+                    </button>
+                </div>
+            </form>
+
+            <!-- Sign Up Link -->
+            <p class="text-center text-sm text-gray-600">
+                Chưa có tài khoản? 
+                <a href="#" class="font-medium text-blue-600 hover:text-blue-500">Đăng ký ngay</a>
+                <li class="nav-item"><a class="nav-link" href="register.html">Lớp 10</a></li>
+            </p>
+
+        </div>
+    </div>
+    <script src="login.js"></script>
+</body>
+</html>
+
+
+
+

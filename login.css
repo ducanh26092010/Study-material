@@ -1,0 +1,18 @@
+
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom styles for better focus and transitions */
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus-within {
+            border-color: #3b82f6; /* blue-500 */
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+        }
+        .submit-btn {
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+        }
