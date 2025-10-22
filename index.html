@@ -137,33 +137,9 @@
         </div>
     </footer>
 
-<script>
-  const url = "https://api.api-ninjas.com/v1/loremipsum?paragraphs=2";
-  const options = {
-    method: "GET",
-    headers: {
-      "X-Api-Key": "ZXy75ObdRc1AnpjGeHm5jw==w3AVZIYMhrd0ym71",
-    }
-  };
-
-  fetch(url, options)
-    .then(res => res.json())
-    .then(data => {
-      console.log(data);
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.innerHTML = data.results.map(item => `
-        <div>
-          <h3><a href="${item.link}" target="_blank">${item.title}</a></h3>
-          <p>${item.snippet}</p>
-        </div>
-      `).join("");
-    })
-    .catch(err => console.error(err));
-</script>
-
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="./js/script.js"></script>
     <script src="./js/gemini.js"></script>
+    <script src="./js/script.js"></script>
 </body>
 </html>
