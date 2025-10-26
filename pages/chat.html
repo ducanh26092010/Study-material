@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Study Assistant</title>
+    <!-- Inter Font and Bootstrap 5 CDN -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      /* --- Global Layout Variables and Styles --- */
+      :root {
+        --navbar-height: 56px; /* Standard Bootstrap navbar height */
+        --input-area-height: 100px;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f4f6f9;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        overflow-x: hidden; /* Prevent horizontal body scrolling */
+      }
+
+      /* Fixed Main Navbar */
+      .main-site-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: var(--navbar-height);
+        z-index: 1030;
+      }
+
+      /* Main content container must clear the fixed navbar */
+      .main-layout-container {
+        padding-top: var(--navbar-height);
+        flex-grow: 1;
+        overflow-y: auto; /* Enable scrolling for the whole main area on mobile/tablets */
+      }
+
+      /* 2. Fixed Sidebar for large screens (Lg and up) */
+      @media (min-width: 992px) {
+        .sidebar-fixed {
+          height: calc(
+            100vh - var(--navbar-height)
+          ); /* Full height below the navbar */
+          position: fixed;
+          top: var(--navbar-height);
+          left: 0;
+          z-index: 1020;
+          overflow-y: auto;
+          background-color: #ffffff;
+          border-right: 1px solid #e9ecef;
+          padding-right: 0 !important;
+        }
+
+        /* 3. Push the main content area to the right to accommodate the fixed sidebar (col-lg-2 = 16.666%) */
+        .main-content-area {
+          margin-left: 16.666%; /* Matches the width of col-lg-2 */
+        }
+      }
+      
+      /* --- Chat Specific Styles --- */
+
+      /* Chat container needs to manage its own scrolling and padding for the fixed input */
+      #chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        min-height: calc(100vh - var(--navbar-height)); /* Ensure it takes at least the viewport height below the main navbar */
+        position: relative;
+      }
+
+      /* Chat Messages Window */
+      #chat-window {
+        flex-grow: 1;
+        overflow-y: auto;
+        padding: 1rem;
+        /* Padding bottom to clear the fixed input area */
+        padding-bottom: calc(var(--input-area-height) + 1rem); 
+        scroll-behavior: smooth;
+        max-width: 100%; /* Ensure responsiveness within its container */
+      }
+
+      /* Fixed Input Area */
+      #input-area {
+        position: fixed;
+        bottom: 0;
+        /* On desktop, align left edge with the chat column's inner content */
+        left: 0; 
+        right: 0;
+        height: var(--input-area-height);
+        background-color: #ffffff;
+        border-top: 1px solid #e9ecef;
+        box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        z-index: 10;
+        padding: 0 1rem;
+        
+      }
+      /* Crucial: On large screens, adjust the left margin/width of the fixed input area to align with the col-lg-10 */
+      @media (min-width: 992px) {
+        #input-area {
+          /* Calculate position relative to the main-content-area start */
+          left: 16.666%; 
+          /* Calculate the remaining width for the input area */
+          width: 83.334%;
+        }
+      }
+
+      /* Textarea styling for responsive height */
+      #user-input {
+        max-height: 80px;
+        resize: none;
+        transition: height 0.2s ease;
+        border-radius: 0.75rem;
+      }
+
+      /* Message Bubble Styling */
+      .message-bubble {
+        max-width: 85%;
+        padding: 0.75rem 1rem;
+        margin-bottom: 0.75rem;
+        border-radius: 1rem;
+        line-height: 1.4;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      }
+
+      .user-message {
+        background-color: #0d6efd;
+        color: white;
+        margin-left: auto;
+        border-bottom-right-radius: 0.25rem;
+      }
+
+      .bot-message {
+        background-color: #ffffff;
+        border: 1px solid #e9ecef;
+        color: #343a40;
+        margin-right: auto;
+        border-bottom-left-radius: 0.25rem;
+      }
+      
+      .bot-message .sources {
+        margin-top: 0.75rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #f0f0f0;
+      }
+
+      /* Loading Indicator */
+      .loading-dots div {
+        width: 8px;
+        height: 8px;
+        margin: 0 2px;
+        background-color: #0d6efd;
+        border-radius: 50%;
+        display: inline-block;
+        animation: bounce 1.4s infinite ease-in-out both;
+      }
+      .loading-dots div:nth-child(1) { animation-delay: -0.32s; }
+      .loading-dots div:nth-child(2) { animation-delay: -0.16s; }
+      @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+      }
+
+      /* Source/Citation Style */
+      .sources a {
+        display: block;
+        font-size: 0.75rem;
+        color: #6c757d;
+        text-decoration: none;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        line-height: 1.2;
+      }
+      .sources a:hover {
+        color: #0d6efd;
+      }
+
+      /* Sidebar Aesthetics */
+      .nav-link {
+        color: #343a40 !important; 
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      .nav-link:hover {
+        color: #0d6efd !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Offcanvas Sidebar for Mobile (d-lg-none) -->
+    <div
+      class="offcanvas offcanvas-start bg-light"
+      tabindex="-1"
+      id="sidebarOffcanvas"
+      aria-labelledby="sidebarOffcanvasLabel"
+    >
+      <div class="offcanvas-header bg-primary text-white shadow-sm">
+        <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">
+          <i class="bi bi-mortarboard-fill me-2"></i>Danh mục
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <nav class="p-3">
+          <h5 class="text-primary mb-3">Danh mục & Bộ lọc</h5>
+          <ul class="nav flex-column">
+            <li class="nav-item fw-bold text-secondary mb-2">Môn học</li>
+            <li class="nav-item mb-1">
+              <a class="nav-link" href="./math.html">Toán học</a>
+            </li>
+            <li class="nav-item mb-1">
+              <a class="nav-link" href="./english.html">Tiếng Anh</a>
+            </li>
+            <li class="nav-item mb-1">
+              <a class="nav-link" href="./van.html">Ngữ Văn</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <!-- Main Fixed Header (Navbar) -->
+    <header class="main-site-header">
+      <nav
+        class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow"
+      >
+        <div class="container-fluid">
+          <!-- Toggle button for mobile sidebar -->
+          <button
+            class="btn btn-outline-light d-lg-none me-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarOffcanvas"
+            aria-controls="sidebarOffcanvas"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-mortarboard-fill"></i> Study 9+
+          </a>
+
+         <form class="d-flex mx-auto d-none d-md-flex" style="width: 400px" id="search-form">
+            <input
+              class="form-control me-2 rounded-pill"
+              type="search"
+              placeholder="Tìm kiếm tài liệu, khóa học..."
+              aria-label="Search"
+            />
+            <button class="btn btn-warning rounded-pill" type="submit">
+              Tìm
+            </button>
+          </form>
+
+          <div class="d-flex ms-auto">
+            <a
+              href="./account.html"
+              class="btn btn-outline-light me-2 d-none  rounded-pill"
+              id="account-btn"
+              >abc@gmail.com</a
+            >
+            <a
+              href="./login.html"
+              class="btn btn-warning rounded-pill"
+              id="login-btn"
+              >Đăng nhập</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- Main Content Layout Container -->
+    <main class="main-layout-container">
+      <div class="container-fluid p-0">
+        <div class="row g-0">
+          <!-- Desktop Sidebar (d-none d-lg-block) - Uses custom fixed styling -->
+          <div class="col-lg-2 d-none d-lg-block sidebar-fixed">
+            <nav class="pt-4 px-3">
+              <h5 class="text-primary mb-3 fw-bold">Danh mục & Bộ lọc</h5>
+              <ul class="nav flex-column">
+                <li class="nav-item fw-bold text-secondary mb-2">Môn học</li>
+                <li class="nav-item mb-1">
+                  <a class="nav-link" href="./math.html">Toán học</a>
+                </li>
+                <li class="nav-item mb-1">
+                  <a class="nav-link" href="./english.html">Tiếng Anh</a>
+                </li>
+                <li class="nav-item mb-1">
+                  <a class="nav-link" href="./van.html">Ngữ Văn</a>
+                </li>
+              </ul>
+
+              <div class="mt-4 pt-3 border-top">
+                <h5 class="text-primary mb-3 fw-bold">Khác</h5>
+                <ul class="nav flex-column">
+                  <li class="nav-item mb-1">
+                    <!-- Current Page Link -->
+                    <a class="nav-link active fw-bold bg-light" href="./chat.html">
+                      <i class="bi bi-robot me-1"></i> Hỏi AI
+                    </a>
+                  </li>
+                  <li class="nav-item mb-1">
+                    <a class="nav-link" href="./account.html"
+                      >Tài khoản của tôi</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </div>
+
+          <!-- Main Chat Content Area - Pushed over by custom CSS on desktop -->
+          <div class="col-12 col-lg-10 main-content-area">
+            <div id="chat-container">
+              <!-- Non-fixed Chat Title Bar (now scrolls with content) -->
+              <div class="d-flex justify-content-between align-items-center p-3 bg-white border-bottom shadow-sm">
+                <h4 class="mb-0 text-primary">
+                  <i class="bi bi-robot me-2"></i>AI Study Assistant
+                </h4>
+                <button
+                  class="btn btn-warning btn-sm rounded-pill"
+                  onclick="clearChat()"
+                >
+                  <i class="bi bi-trash"></i> Bắt đầu lại
+                </button>
+              </div>
+
+              <!-- Chat Messages Window -->
+              <div id="chat-window" class="container">
+                <!-- Initial Welcome Message (defined in JS for consistency) -->
+              </div>
+
+              <!-- Fixed Input Area (Positioned relative to viewport, adjusted by CSS) -->
+              <div id="input-area" class="container">
+                <form class="w-100 d-flex" onsubmit="sendMessage(event)">
+                  <textarea
+                    id="user-input"
+                    class="form-control me-3"
+                    rows="1"
+                    placeholder="Nhập câu hỏi của bạn..."
+                    required
+                    onkeydown="handleKey(event)"
+                  ></textarea>
+                  <button
+                    id="send-button"
+                    type="submit"
+                    class="btn btn-primary rounded-pill px-4"
+                    disabled
+                  >
+                    <i class="bi bi-send-fill"></i>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <!-- Footer -->
+    <!-- <footer class="bg-dark text-white-50 py-4 mt-5">
+      <div class="container">
+        <div class="text-center">
+          <small
+            >Admin: Nguyễn Đức Anh | Gmail: bin26092010@gmail.com | Hotline:
+            0822151086 | Việt Nam</small
+          >
+        </div>
+      </div>
+    </footer> -->
+
+    <!-- Firebase and Application Logic -->
+    <script type="module">
+      import { initializeApp as initializeFirebaseApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+      import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+      // --- Global State and Constants ---
+      let auth;
+      let db; 
+      let userId = null;
+      let chatHistory = [];
+      let isGenerating = false;
+      const CHAT_WINDOW = document.getElementById("chat-window");
+      const USER_INPUT = document.getElementById("user-input");
+      const SEND_BUTTON = document.getElementById("send-button");
+      const API_MODEL = "gemini-2.5-flash-preview-09-2025";
+      const API_KEY = ""; 
+
+      // Utility function for exponential backoff retry logic
+      const fetchWithRetry = async (url, options, maxRetries = 3) => {
+          for (let attempt = 0; attempt < maxRetries; attempt++) {
+              try {
+                  const response = await fetch(url, options);
+                  if (response.status !== 429 && response.ok) {
+                      return response;
+                  }
+                  if (response.status === 429 && attempt < maxRetries - 1) {
+                      const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                      console.log(`Rate limit hit (429). Retrying in ${delay / 1000}s...`);
+                      await new Promise(resolve => setTimeout(resolve, delay));
+                      continue;
+                  }
+                  throw new Error(`API call failed with status: ${response.status}`);
+              } catch (error) {
+                  if (attempt === maxRetries - 1) throw error;
+                  const delay = Math.pow(2, attempt) * 1000 + Math.random() * 1000;
+                  console.log(`Fetch error. Retrying in ${delay / 1000}s...`);
+                  await new Promise(resolve => setTimeout(resolve, delay));
+              }
+          }
+      };
+      
+      // --- Initialization ---
+      async function initApp() {
+        try {
+          // Mandatory Canvas Global Variables
+          const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+          const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+          if (Object.keys(firebaseConfig).length === 0) {
+             console.error("Firebase configuration is missing.");
+             return;
+          }
+          
+          const app = initializeFirebaseApp(firebaseConfig);
+          auth = getAuth(app);
+
+          if (initialAuthToken) {
+            await signInWithCustomToken(auth, initialAuthToken);
+          } else {
+            await signInAnonymously(auth);
+          }
+
+          userId = auth.currentUser?.uid || crypto.randomUUID();
+          
+          console.log(`Firebase initialized. User ID: ${userId}`);
+          SEND_BUTTON.disabled = false;
+          
+          displayWelcomeMessage();
+          setupEventListeners();
+
+        } catch (error) {
+          console.error("Firebase Initialization Failed:", error);
+          displayMessage("bot", "Lỗi hệ thống: Không thể kết nối với dịch vụ chat. Vui lòng thử lại sau.", null);
+          SEND_BUTTON.disabled = true;
+        }
+      }
+
+      function displayWelcomeMessage() {
+          const initialMessage = `
+            <p class="fw-bold mb-1 text-primary">StudyBot</p>
+            Chào bạn! Tôi là StudyBot, trợ lý học tập AI của Study 9+. Hãy hỏi tôi bất cứ điều gì về **Toán, Văn, Anh, Khoa học**, hoặc bất kỳ câu hỏi học thuật nào khác.
+            <p class="mt-2 mb-0 small text-muted">
+              Ví dụ: "Chứng minh định lý Pythagore" hoặc "Tóm tắt truyện Chiếc thuyền ngoài xa."
+            </p>
+          `;
+          displayMessage("bot", initialMessage, null);
+      }
+
+      function setupEventListeners() {
+        USER_INPUT.addEventListener('input', autoResizeTextarea);
+      }
+
+      function autoResizeTextarea() {
+        USER_INPUT.style.height = 'auto';
+        USER_INPUT.style.height = USER_INPUT.scrollHeight + 'px';
+      }
+      
+      // --- Chat UI Functions ---
+
+      function displayMessage(sender, text, sources) {
+        const messageClass = sender === "user" ? "user-message" : "bot-message";
+        const senderName = sender === "user" ? "Bạn" : "StudyBot";
+        const alignmentClass = sender === "user" ? "align-items-end" : "align-items-start";
+
+        let messageHtml = `<p class="mb-0">${text}</p>`;
+
+        if (sender === "bot" && sources && sources.length > 0) {
+          const sourceList = sources.map((source, index) => 
+            `<a href="${source.uri}" target="_blank" title="${source.title} - ${source.uri}">${index + 1}. ${source.title}</a>`
+          ).join("");
+          messageHtml += `<div class="sources"><small class="text-muted">Nguồn:</small>${sourceList}</div>`;
+        }
+
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `d-flex flex-column ${alignmentClass}`;
+        messageDiv.innerHTML = `
+          <div class="message-bubble ${messageClass}">
+            <p class="fw-bold mb-1 ${sender === "bot" ? "text-primary" : ""}">
+                ${senderName}
+            </p>
+            ${messageHtml}
+          </div>
+        `;
+        CHAT_WINDOW.appendChild(messageDiv);
+        CHAT_WINDOW.scrollTop = CHAT_WINDOW.scrollHeight;
+      }
+
+      function displayLoading(messageId) {
+        const loadingDiv = document.createElement("div");
+        loadingDiv.id = messageId;
+        loadingDiv.className = "d-flex flex-column align-items-start";
+        loadingDiv.innerHTML = `
+          <div class="message-bubble bot-message shadow-sm">
+            <p class="fw-bold mb-1 text-primary">StudyBot</p>
+            <div class="loading-dots"><div></div><div></div><div></div></div>
+          </div>
+        `;
+        CHAT_WINDOW.appendChild(loadingDiv);
+        CHAT_WINDOW.scrollTop = CHAT_WINDOW.scrollHeight;
+      }
+      
+      function removeLoading(messageId) {
+        const loadingElement = document.getElementById(messageId);
+        if (loadingElement) {
+          CHAT_WINDOW.removeChild(loadingElement);
+        }
+      }
+
+      // --- Chat Logic ---
+
+      function handleKey(event) {
+        if (event.key === 'Enter' && !event.shiftKey) {
+          event.preventDefault();
+          sendMessage(event);
+        }
+      }
+
+      window.clearChat = function() {
+        chatHistory = [];
+        CHAT_WINDOW.innerHTML = "";
+        displayWelcomeMessage();
+        USER_INPUT.value = "";
+        autoResizeTextarea();
+        console.log("Cuộc trò chuyện đã được làm mới!"); 
+      }
+      
+      async function sendMessage(event) {
+        event.preventDefault();
+        if (isGenerating || USER_INPUT.value.trim() === "") return;
+
+        const userQuery = USER_INPUT.value.trim();
+        USER_INPUT.value = "";
+        autoResizeTextarea();
+        
+        isGenerating = true;
+        SEND_BUTTON.disabled = true;
+
+        // 1. Display user message
+        displayMessage("user", userQuery, null);
+
+        // 2. Add to history for API call
+        chatHistory.push({ role: "user", parts: [{ text: userQuery }] });
+
+        // 3. Display loading
+        const loadingId = `loading-${Date.now()}`;
+        displayLoading(loadingId);
+        
+        try {
+          await generateGeminiResponse();
+        } catch (error) {
+          console.error("Gemini API Error:", error);
+          displayMessage("bot", "Xin lỗi, đã xảy ra lỗi trong quá trình xử lý. Vui lòng thử lại sau.", null);
+        } finally {
+          // 4. Clean up
+          removeLoading(loadingId);
+          isGenerating = false;
+          SEND_BUTTON.disabled = false;
+        }
+      }
+
+      async function generateGeminiResponse() {
+          const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${API_MODEL}:generateContent?key=${API_KEY}`;
+          
+          const systemPrompt = `
+              Bạn là StudyBot, một trợ lý học tập thân thiện và chuyên nghiệp của Study 9+.
+              Hãy trả lời các câu hỏi học thuật của học sinh về Toán học, Tiếng Anh, Ngữ Văn, Khoa học, v.v.
+              Sử dụng ngôn ngữ lịch sự, rõ ràng, dễ hiểu (phù hợp với cấp độ học sinh trung học).
+              Khi cần tìm kiếm thông tin mới hoặc cụ thể (như tin tức, dữ liệu), hãy sử dụng công cụ tìm kiếm.
+              Định dạng các công thức Toán học bằng ký hiệu LaTeX (ví dụ: $x^2 + y^2 = r^2$).
+              Cung cấp câu trả lời chi tiết và hữu ích.
+          `;
+          
+          const payload = {
+              contents: chatHistory,
+              tools: [{ "google_search": {} }],
+              systemInstruction: {
+                  parts: [{ text: systemPrompt }]
+              },
+          };
+
+          const response = await fetchWithRetry(apiUrl, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+          });
+          
+          const result = await response.json();
+          const candidate = result.candidates?.[0];
+          
+          if (candidate && candidate.content?.parts?.[0]?.text) {
+              const text = candidate.content.parts[0].text;
+              
+              let sources = [];
+              const groundingMetadata = candidate.groundingMetadata;
+              if (groundingMetadata && groundingMetadata.groundingAttributions) {
+                  sources = groundingMetadata.groundingAttributions
+                      .map(attribution => ({
+                          uri: attribution.web?.uri,
+                          title: attribution.web?.title,
+                      }))
+                      .filter(source => source.uri && source.title)
+                      // Deduplicate sources by URI
+                      .filter((value, index, self) => 
+                          index === self.findIndex((t) => (
+                              t.uri === value.uri
+                          ))
+                      );
+              }
+
+              // Update history and display
+              chatHistory.push({ role: "model", parts: [{ text: text }] });
+              displayMessage("bot", text, sources);
+
+          } else {
+              console.error("API response lacked content:", result);
+              displayMessage("bot", "Xin lỗi, StudyBot không thể trả lời câu hỏi này lúc này.", null);
+          }
+      }
+
+      // Start the application
+      window.onload = initApp;
+    </script>
+
+    <!-- Bootstrap JavaScript Bundle -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+       <script src="../js/nav.js"></script>
+
+  </body>
+</html>

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Study 9+</title>
+    <!-- Inter Font and Bootstrap 5 CDN -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      /* Define variables for fixed elements */
+      :root {
+        --navbar-height: 56px; /* Standard Bootstrap navbar height */
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f4f6f9; /* Light, soft background */
+      }
+
+      /* 1. Main content container must clear the fixed navbar */
+      .main-layout-container {
+        padding-top: calc(var(--navbar-height) + 1.5rem);
+      }
+
+      /* 2. Fixed Sidebar for large screens (Lg and up) */
+      @media (min-width: 992px) {
+        .sidebar-fixed {
+          height: calc(
+            100vh - var(--navbar-height)
+          ); /* Full height below the navbar */
+          position: fixed;
+          top: var(--navbar-height);
+          left: 0;
+          z-index: 1020;
+          overflow-y: auto;
+          background-color: #ffffff;
+          border-right: 1px solid #e9ecef;
+          padding-right: 0 !important;
+        }
+
+        /* 3. Push the main content area to the right to accommodate the fixed sidebar (col-lg-2 = 16.666%) */
+        .main-content-area {
+          margin-left: 16.666%; /* Matches the width of col-lg-2 */
+        }
+      }
+
+      /* Card Hover Effect - Applied to History List Items */
+      .card {
+        border-radius: 0.75rem;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .nav-link {
+        color: #343a40 !important; /* Ensure visibility on light sidebar background */
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      .nav-link:hover {
+        color: #0d6efd !important;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Offcanvas Sidebar for Mobile (d-lg-none) - Content defined in the body below -->
+    <div
+      class="offcanvas offcanvas-start bg-light"
+      tabindex="-1"
+      id="sidebarOffcanvas"
+      aria-labelledby="sidebarOffcanvasLabel"
+    >
+      <div class="offcanvas-header bg-primary text-white shadow-sm">
+        <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">
+          <i class="bi bi-mortarboard-fill me-2"></i>Danh mục
+        </h5>
+        <button
+          type="button"
+          class="btn-close btn-close-white"
+          data-bs-dismiss="offcanvas"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="offcanvas-body">
+        <!-- Sidebar content replicated here -->
+        <nav class="p-3">
+          <h5 class="text-primary mb-3">Danh mục & Bộ lọc</h5>
+          <ul class="nav flex-column">
+            <li class="nav-item fw-bold text-secondary mb-2">Môn học</li>
+            <li class="nav-item mb-1">
+              <a class="nav-link" href="../pages/math.html">Toán học</a>
+            </li>
+            <li class="nav-item mb-1">
+              <a class="nav-link" href="../pages/english.html">Tiếng Anh</a>
+            </li>
+            <li class="nav-item mb-1">
+              <a class="nav-link" href="../pages/van.html">Ngữ Văn</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+    </div>
+
+    <header>
+      <nav
+        class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow"
+      >
+        <div class="container-fluid">
+          <!-- Toggle button for mobile sidebar -->
+          <button
+            class="btn btn-outline-light d-lg-none me-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarOffcanvas"
+            aria-controls="sidebarOffcanvas"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <a class="navbar-brand fw-bold" href="#">
+            <i class="bi bi-mortarboard-fill"></i> Study 9+
+          </a>
+
+          <!-- Fixed: Corrected the typo in style attribute -->
+          <form
+            class="d-flex mx-auto d-none d-md-flex"
+            style="width: 400px"
+            id="search-form"
+          >
+            <input
+              class="form-control me-2 rounded-pill"
+              type="search"
+              placeholder="Tìm kiếm tài liệu, khóa học..."
+              aria-label="Search"
+            />
+            <button class="btn btn-warning rounded-pill" type="submit">
+              Tìm
+            </button>
+          </form>
+
+          <div class="d-flex ms-auto">
+            <a
+              href="./account.html"
+              class="btn btn-outline-light me-2 d-none  rounded-pill"
+              id="account-btn"
+              >abc@gmail.com</a
+            >
+            <a
+              href="./login.html"
+              class="btn btn-warning rounded-pill"
+              id="login-btn"
+              >Đăng nhập</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-layout-container" style="min-height: 100vh">
+      <div class="container-fluid">
+        <div class="row">
+          <!-- Desktop Sidebar (d-none d-lg-block) - Uses custom fixed styling -->
+          <div class="col-lg-2 d-none d-lg-block sidebar-fixed">
+            <nav class="pt-4 px-3">
+              <h5 class="text-primary mb-3 fw-bold">Danh mục & Bộ lọc</h5>
+              <ul class="nav flex-column">
+                <li class="nav-item fw-bold text-secondary mb-2">Môn học</li>
+                <li class="nav-item mb-1">
+                  <a class="nav-link" href="../pages/math.html">Toán học</a>
+                </li>
+                <li class="nav-item mb-1">
+                  <a class="nav-link" href="../pages/english.html">Tiếng Anh</a>
+                </li>
+                <li class="nav-item mb-1">
+                  <a class="nav-link" href="../pages/van.html">Ngữ Văn</a>
+                </li>
+              </ul>
+
+              <div class="mt-4 pt-3 border-top">
+                <h5 class="text-primary mb-3 fw-bold">Khác</h5>
+                <ul class="nav flex-column">
+                  <li class="nav-item mb-1">
+                    <a class="nav-link" href="../pages/chat.html">Hỏi AI</a>
+                  </li>
+                  <li class="nav-item mb-1">
+                    <a class="nav-link" href="../pages/account.html"
+                      >Tài khoản của tôi</a
+                    >
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </div>
+
+          <!-- Main Content Area - Pushed over by custom CSS on desktop -->
+          <div class="col-12 col-lg-10 main-content-area">
+            <h2 class="mt-4 mb-5 text-primary fw-bold border-bottom pb-2">
+              Lịch sử mua tài liệu
+            </h2>
+
+            <!-- History List Container: Now uses row-cols-1 to force one item per row -->
+            <div id="history-list" class="row row-cols-1 g-4">
+              <!-- History Item 1: Completed Purchase -->
+              <div class="col">
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start mb-3"
+                    >
+                      <div>
+                        <h5 class="card-title text-primary fw-bold mb-1">
+                          Toán Học: Chuyên đề Lượng Giác
+                        </h5>
+                        <p class="card-text text-muted small">
+                          Mã giao dịch: TXN-547829
+                        </p>
+                      </div>
+                      <span
+                        class="badge bg-success py-2 px-3 rounded-pill fw-normal"
+                        >Đã hoàn thành</span
+                      >
+                    </div>
+                    <p class="mb-1">
+                      <i class="bi bi-calendar-check me-2 text-secondary"></i
+                      >Ngày mua: 15/10/2025
+                    </p>
+                    <p class="mb-3">
+                      <i class="bi bi-tag-fill me-2 text-secondary"></i>Giá:
+                      <strong>199.000 VNĐ</strong>
+                    </p>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-outline-primary rounded-pill w-100"
+                      >Xem Tài liệu <i class="bi bi-box-arrow-in-up-right"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- History Item 2: Pending/Processing Order -->
+              <div class="col">
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start mb-3"
+                    >
+                      <div>
+                        <h5 class="card-title text-primary fw-bold mb-1">
+                          Tiếng Anh: Ngữ pháp TOEIC 2026
+                        </h5>
+                        <p class="card-text text-muted small">
+                          Mã giao dịch: TXN-547830
+                        </p>
+                      </div>
+                      <span
+                        class="badge bg-warning text-dark py-2 px-3 rounded-pill fw-normal"
+                        >Đang xử lý</span
+                      >
+                    </div>
+                    <p class="mb-1">
+                      <i class="bi bi-calendar-check me-2 text-secondary"></i
+                      >Ngày mua: 20/10/2025
+                    </p>
+                    <p class="mb-3">
+                      <i class="bi bi-tag-fill me-2 text-secondary"></i>Giá:
+                      <strong>349.000 VNĐ</strong>
+                    </p>
+                    <button
+                      class="btn btn-sm btn-outline-secondary rounded-pill w-100"
+                      disabled
+                    >
+                      Chờ xác nhận...
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- History Item 3: Cancelled Order -->
+              <div class="col">
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start mb-3"
+                    >
+                      <div>
+                        <h5 class="card-title text-primary fw-bold mb-1">
+                          Ngữ Văn: Phân tích Truyện ngắn
+                        </h5>
+                        <p class="card-text text-muted small">
+                          Mã giao dịch: TXN-547831
+                        </p>
+                      </div>
+                      <span
+                        class="badge bg-danger py-2 px-3 rounded-pill fw-normal"
+                        >Đã hủy</span
+                      >
+                    </div>
+                    <p class="mb-1">
+                      <i class="bi bi-calendar-check me-2 text-secondary"></i
+                      >Ngày đặt: 01/10/2025
+                    </p>
+                    <p class="mb-3">
+                      <i class="bi bi-tag-fill me-2 text-secondary"></i>Giá:
+                      <strong>99.000 VNĐ</strong>
+                    </p>
+                    <button
+                      class="btn btn-sm btn-outline-danger rounded-pill w-100"
+                      disabled
+                    >
+                      Đã hủy bỏ
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- History Item 4: Another Completed Purchase -->
+              <div class="col">
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start mb-3"
+                    >
+                      <div>
+                        <h5 class="card-title text-primary fw-bold mb-1">
+                          Lớp 11: Tổng hợp Công thức Vật Lý
+                        </h5>
+                        <p class="card-text text-muted small">
+                          Mã giao dịch: TXN-547828
+                        </p>
+                      </div>
+                      <span
+                        class="badge bg-success py-2 px-3 rounded-pill fw-normal"
+                        >Đã hoàn thành</span
+                      >
+                    </div>
+                    <p class="mb-1">
+                      <i class="bi bi-calendar-check me-2 text-secondary"></i
+                      >Ngày mua: 05/10/2025
+                    </p>
+                    <p class="mb-3">
+                      <i class="bi bi-tag-fill me-2 text-secondary"></i>Giá:
+                      <strong>120.000 VNĐ</strong>
+                    </p>
+                    <a
+                      href="#"
+                      class="btn btn-sm btn-outline-primary rounded-pill w-100"
+                      >Xem Tài liệu <i class="bi bi-box-arrow-in-up-right"></i
+                    ></a>
+                  </div>
+                </div>
+              </div>
+
+              <!-- History Item 5: Refunded Order -->
+              <div class="col">
+                <div class="card h-100 shadow-sm">
+                  <div class="card-body">
+                    <div
+                      class="d-flex justify-content-between align-items-start mb-3"
+                    >
+                      <div>
+                        <h5 class="card-title text-primary fw-bold mb-1">
+                          Toán: Khóa học Giải tích cơ bản
+                        </h5>
+                        <p class="card-text text-muted small">
+                          Mã giao dịch: TXN-547827
+                        </p>
+                      </div>
+                      <span
+                        class="badge bg-secondary py-2 px-3 rounded-pill fw-normal"
+                        >Đã hoàn tiền</span
+                      >
+                    </div>
+                    <p class="mb-1">
+                      <i class="bi bi-calendar-check me-2 text-secondary"></i
+                      >Ngày mua: 28/09/2025
+                    </p>
+                    <p class="mb-3">
+                      <i class="bi bi-tag-fill me-2 text-secondary"></i>Giá:
+                      <strong>499.000 VNĐ</strong>
+                    </p>
+                    <button
+                      class="btn btn-sm btn-outline-secondary rounded-pill w-100"
+                      disabled
+                    >
+                      Đã xem thông tin
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Empty state placeholder (optional, but good for design) -->
+              <div class="col-12 mt-5 text-center" style="opacity: 0.6">
+                <i class="bi bi-archive display-4 text-muted"></i>
+                <p class="mt-3 text-muted">
+                  Không tìm thấy lịch sử giao dịch nào cũ hơn.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-dark text-white-50 py-4 mt-5">
+      <div class="container">
+        <div class="text-center">
+          <small
+            >Admin: Nguyễn Đức Anh | Gmail: bin26092010@gmail.com | Hotline:
+            0822151086 | Việt Nam</small
+          >
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JavaScript Bundle -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      crossorigin="anonymous"
+    ></script>
+
+    <script src="../js/nav.js"></script>
+  </body>
+</html>
