@@ -1,151 +1,209 @@
+import { auth, db } from "./firebase-config.js";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  onAuthStateChanged, // Để theo dõi trạng thái đăng nhập
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  getDoc,
+  setDoc,
+  doc,
+  updateDoc,
+  arrayUnion,
+} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 // ======================
-// 🧠 QUẢN LÝ NGƯỜI DÙNG TRONG localStorage (key = email)
+// 🛠 CÁC HÀM HỖ TRỢ (HELPER FUNCTIONS)
 // ======================
 
-// Hàm lấy thông tin người dùng theo email
-function getUserByEmail(email) {
-  const data = localStorage.getItem(email);
-  return data ? JSON.parse(data) : null;
-}
-
-// Hàm lưu người dùng (key là email)
-function saveUser(user) {
-  localStorage.setItem(user.email, JSON.stringify(user));
-}
-
-// Hàm kiểm tra xem email đã tồn tại chưa
-function userExists(email) {
-  return localStorage.getItem(email) !== null;
-}
-
-// Hàm kiểm tra xem username đã tồn tại chưa
-function usernameExists(username) {
-  // Duyệt toàn bộ localStorage để tìm user có name trùng
-  for (let i = 0; i < localStorage.length; i++) {
-    const key = localStorage.key(i);
-    // Bỏ qua "currentUser" vì đó không phải tài khoản thật
-    if (key === "currentUser") continue;
-
-    const user = JSON.parse(localStorage.getItem(key));
-    if (user.name.toLowerCase() === username.toLowerCase()) {
-      return true; // Có username trùng
-    }
-  }
-  return false;
+// Hàm kiểm tra xem username đã tồn tại trong Firestore chưa
+async function checkUsernameExists(username) {
+  const usersRef = collection(db, "users");
+  const q = query(usersRef, where("name", "==", username)); // Giả sử field tên là 'name'
+  const querySnapshot = await getDocs(q);
+  return !querySnapshot.empty;
 }
 
 // ======================
 // 🟡 XỬ LÝ ĐĂNG KÝ TÀI KHOẢN
 // ======================
 
-document.querySelector("#signup-pane form").addEventListener("submit", function (e) {
-  e.preventDefault();
+document
+  .querySelector("#signup-pane form")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  // --- Lấy dữ liệu từ form ---
-  const username = document.getElementById("registerUsername").value.trim();
-  const email = document.getElementById("registerEmail").value.trim().toLowerCase();
-  const password = document.getElementById("registerPassword").value;
-  const confirmPassword = document.getElementById("confirmPassword").value;
+    // --- Lấy dữ liệu từ form ---
+    const username = document.getElementById("registerUsername").value.trim();
+    const email = document
+      .getElementById("registerEmail")
+      .value.trim()
+      .toLowerCase();
+    const password = document.getElementById("registerPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
 
-  // --- Kiểm tra hợp lệ ---
-  if (!username || !email || !password) {
-    alert("⚠️ Vui lòng nhập đầy đủ thông tin!");
-    return;
-  }
-  if (password.length < 6) {
-    alert("⚠️ Mật khẩu phải có ít nhất 6 ký tự!");
-    return;
-  }
-  if (password !== confirmPassword) {
-    alert("⚠️ Mật khẩu xác nhận không khớp!");
-    return;
-  }
+    // --- Kiểm tra hợp lệ ---
+    if (!username || !email || !password) {
+      alert("⚠️ Vui lòng nhập đầy đủ thông tin!");
+      return;
+    }
+    if (password.length < 6) {
+      alert("⚠️ Mật khẩu phải có ít nhất 6 ký tự!");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("⚠️ Mật khẩu xác nhận không khớp!");
+      return;
+    }
 
-  // --- Kiểm tra trùng email ---
-  if (userExists(email)) {
-    alert("⚠️ Email này đã được đăng ký. Vui lòng chọn email khác!");
-    return;
-  }
+    try {
+      // 1. Kiểm tra trùng tên đăng nhập (Query Firestore)
+      const isUsernameTaken = await checkUsernameExists(username);
+      if (isUsernameTaken) {
+        alert("⚠️ Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác!");
+        return;
+      }
 
-  // --- Kiểm tra trùng tên đăng nhập ---
-  if (usernameExists(username)) {
-    alert("⚠️ Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác!");
-    return;
-  }
+      // 2. Tạo tài khoản Authentication (Firebase sẽ tự check trùng email)
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-  // --- Tạo user mới ---
-  const newUser = {
-    name: username,
-    email: email,
-    password: password,
-    purchaseHistory: [],
-  };
+      // 3. Lưu thông tin bổ sung vào Firestore (Không lưu password!)
+      // Dùng UID làm ID của document để dễ truy xuất
+      await setDoc(doc(db, "users", user.uid), {
+        name: username,
+        email: email,
+        purchaseHistory: [],
+        createdAt: new Date(),
+      });
 
-  // --- Lưu vào localStorage (key = email) ---
-  saveUser(newUser);
+      alert("🎉 Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.");
 
-  alert("🎉 Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.");
-
-  // Reset form & chuyển sang tab Đăng nhập
-  e.target.reset();
-  const tabTrigger = new bootstrap.Tab(document.querySelector("#signin-tab"));
-  tabTrigger.show();
-});
+      // Reset form & chuyển sang tab Đăng nhập
+      e.target.reset();
+      // Logic chuyển tab Bootstrap (giữ nguyên)
+      const tabTrigger = new bootstrap.Tab(
+        document.querySelector("#signin-tab")
+      );
+      tabTrigger.show();
+    } catch (error) {
+      console.error("Lỗi đăng ký:", error);
+      if (error.code === "auth/email-already-in-use") {
+        alert("⚠️ Email này đã được đăng ký. Vui lòng dùng email khác!");
+      } else {
+        alert("❌ Đã có lỗi xảy ra: " + error.message);
+      }
+    }
+  });
 
 // ======================
 // 🔵 XỬ LÝ ĐĂNG NHẬP
 // ======================
 
-document.querySelector("#signin-pane form").addEventListener("submit", function (e) {
-  e.preventDefault();
+document
+  .querySelector("#signin-pane form")
+  .addEventListener("submit", async function (e) {
+    e.preventDefault();
 
-  const loginInput = document.getElementById("loginEmail").value.trim().toLowerCase();
-  const password = document.getElementById("loginPassword").value;
+    const email = document
+      .getElementById("loginEmail")
+      .value.trim()
+      .toLowerCase();
+    const password = document.getElementById("loginPassword").value;
 
-  // --- Lấy người dùng bằng email ---
-  const user = getUserByEmail(loginInput);
+    try {
+      // 1. Đăng nhập qua Firebase Auth
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      const user = userCredential.user;
 
-  if (!user) {
-    alert("❌ Email không tồn tại. Vui lòng kiểm tra lại!");
-    return;
-  }
+      // 2. Lấy thông tin chi tiết từ Firestore (để lấy username)
+      const docRef = doc(db, "users", user.uid);
+      const docSnap = await getDoc(docRef);
 
-  // --- Kiểm tra mật khẩu ---
-  if (user.password !== password) {
-    alert("❌ Mật khẩu không đúng!");
-    return;
-  }
+      if (docSnap.exists()) {
+        const userData = docSnap.data();
 
-  // --- Lưu người dùng đang đăng nhập ---
-  localStorage.setItem("currentUser", JSON.stringify(user));
+        // Tùy chọn: Lưu thông tin cơ bản vào localStorage nếu cần truy cập nhanh ở trang khác
+        // (Nhưng tốt nhất nên dùng onAuthStateChanged ở trang đích)
+        localStorage.setItem("currentUser", JSON.stringify(userData));
 
-  alert(`✅ Xin chào ${user.name}! Đăng nhập thành công 🎉`);
+        alert(`✅ Xin chào ${userData.name}! Đăng nhập thành công 🎉`);
 
-  // 👉 Có thể chuyển hướng sang trang chính nếu cần:
-  window.location.href = "../index.html";
-});
+        // Chuyển hướng
+        window.location.href = "../index.html";
+      } else {
+        alert(
+          "⚠️ Đăng nhập thành công nhưng không tìm thấy dữ liệu người dùng!"
+        );
+      }
+    } catch (error) {
+      console.error("Lỗi đăng nhập:", error);
+      if (
+        error.code === "auth/invalid-credential" ||
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
+        alert("❌ Email hoặc mật khẩu không đúng!");
+      } else {
+        alert("❌ Lỗi đăng nhập: " + error.message);
+      }
+    }
+  });
 
 // ======================
 // 🛒 HÀM THÊM LỊCH SỬ MUA TÀI LIỆU
 // ======================
 
-function addPurchase(docId, status = "Đã mua") {
-  const currentUser = JSON.parse(localStorage.getItem("currentUser"));
+async function addPurchase(docId, status = "Đã mua") {
+  // Lấy user hiện tại từ Firebase Auth (đáng tin cậy hơn localStorage)
+  const currentUser = auth.currentUser;
 
   if (!currentUser) {
     alert("⚠️ Vui lòng đăng nhập trước khi mua tài liệu!");
+    // Có thể redirect về trang login
     return;
   }
 
-  // --- Lấy lại dữ liệu người dùng bằng email ---
-  const user = getUserByEmail(currentUser.email);
+  try {
+    const userRef = doc(db, "users", currentUser.uid);
 
-  // --- Thêm lịch sử mua mới ---
-  user.purchaseHistory.push({ id: docId, status });
+    // Sử dụng arrayUnion để thêm vào mảng mà không bị ghi đè dữ liệu cũ
+    await updateDoc(userRef, {
+      purchaseHistory: arrayUnion({
+        id: docId,
+        status: status,
+        purchasedAt: new Date(),
+      }),
+    });
 
-  // --- Cập nhật lại localStorage ---
-  saveUser(user);
-  localStorage.setItem("currentUser", JSON.stringify(user)); // Cập nhật user đang đăng nhập
+    alert(`🧾 Đã thêm tài liệu ${docId} vào lịch sử mua.`);
 
-  alert(`🧾 Đã thêm tài liệu ${docId} vào lịch sử mua.`);
+    // Nếu bạn đang dùng localStorage để hiển thị UI, hãy cập nhật lại nó (tùy chọn)
+    // Lưu ý: Cách tốt nhất là listen snapshot từ Firestore realtime.
+  } catch (error) {
+    console.error("Lỗi mua hàng:", error);
+    alert("❌ Không thể lưu lịch sử mua: " + error.message);
+  }
 }
+
+// (Tùy chọn) Theo dõi trạng thái đăng nhập toàn cục
+// Giúp giữ trạng thái đăng nhập khi F5 trang
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    console.log("User đang đăng nhập:", user.email);
+    // Có thể update UI ở đây (ví dụ: đổi nút Đăng nhập thành Avatar)
+  } else {
+    console.log("Chưa có user đăng nhập");
+  }
+});
