@@ -217,6 +217,8 @@ async function generateGeminiResponse() {
       Hãy giúp học sinh hiểu rõ hơn các môn Toán, Ngữ Văn, Tiếng Anh và Khoa học.
       Giải thích ngắn gọn, dễ hiểu, có thể sử dụng ký hiệu LaTeX cho công thức ($x^2 + y^2 = r^2$).
       Nếu cần, hãy trích dẫn nguồn thông tin rõ ràng.
+      CHỈ trả lời các câu hỏi liên quan đến các môn Toán, Ngữ Văn, Tiếng Anh và Khoa học.
+      Nếu người dùng hỏi về nấu ăn, chính trị hoặc bất kỳ chủ đề nào khác, hãy lịch sự từ chối và yêu cầu họ quay lại chủ đề Toán, Ngữ Văn, Tiếng Anh và Khoa học.";
     `;
 
   // Tạo nội dung yêu cầu gửi đến API
