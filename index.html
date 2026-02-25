@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -10,13 +10,10 @@
       rel="stylesheet"
     />
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
       rel="stylesheet"
+      integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
       crossorigin="anonymous"
-    />
-    <link
-      rel="stylesheet"
-      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
     />
 
     <style>
@@ -60,7 +57,9 @@
       /* Card Hover Effect */
       .card {
         border-radius: 0.75rem;
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
       }
       .card:hover {
         transform: translateY(-5px);
@@ -78,14 +77,16 @@
     </style>
   </head>
   <body>
-    <!-- Offcanvas Sidebar for Mobile (d-lg-none) - Content defined in the body below -->
+    <!-- Offcanvas Sidebar for Mobile -->
     <div
-      class="offcanvas offcanvas-start bg-light"
+      class="offcanvas offcanvas-start d-lg-none"
       tabindex="-1"
       id="sidebarOffcanvas"
       aria-labelledby="sidebarOffcanvasLabel"
+      data-bs-backdrop="true"
+      data-bs-scroll="false"
     >
-      <div class="offcanvas-header bg-primary text-white shadow-sm">
+      <div class="offcanvas-header bg-primary text-white">
         <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">
           <i class="bi bi-mortarboard-fill me-2"></i>Danh mục
         </h5>
@@ -96,19 +97,23 @@
           aria-label="Close"
         ></button>
       </div>
-      <div class="offcanvas-body">
-        <!-- Sidebar content replicated here -->
-        <nav class="p-3">
+
+      <div class="offcanvas-body bg-light">
+        <nav>
           <h5 class="text-primary mb-3">Danh mục & Bộ lọc</h5>
+
           <ul class="nav flex-column">
             <li class="nav-item fw-bold text-secondary mb-2">Môn học</li>
-            <li class="nav-item mb-1">
+
+            <li class="nav-item">
               <a class="nav-link" href="./pages/math.html">Toán học</a>
             </li>
-            <li class="nav-item mb-1">
+
+            <li class="nav-item">
               <a class="nav-link" href="./pages/english.html">Tiếng Anh</a>
             </li>
-            <li class="nav-item mb-1">
+
+            <li class="nav-item">
               <a class="nav-link" href="./pages/van.html">Ngữ Văn</a>
             </li>
           </ul>
@@ -133,12 +138,16 @@
             <span class="navbar-toggler-icon"></span>
           </button>
 
-          <a class="navbar-brand fw-bold" href="#">
+          <a class="navbar-brand fw-bold" href="#" id="home-link">
             <i class="bi bi-mortarboard-fill"></i> Study 9+
           </a>
 
           <!-- Fixed: Corrected the typo in style attribute -->
-          <form class="d-flex mx-auto d-none d-md-flex" style="width: 400px">
+          <form
+            class="d-flex mx-auto d-none d-md-flex"
+            style="width: 400px"
+            id="search-form"
+          >
             <input
               class="form-control me-2 rounded-pill"
               type="search"
@@ -153,10 +162,14 @@
           <div class="d-flex ms-auto">
             <a
               href="./pages/account.html"
-              class="btn btn-outline-light me-2 d-none  rounded-pill"
+              class="btn btn-outline-light me-2 d-none rounded-pill"
+              id="logout-link"
               >abc@gmail.com</a
             >
-            <a href="./pages/login.html" class="btn btn-warning rounded-pill"
+            <a
+              href="./pages/login.html"
+              class="btn btn-warning rounded-pill"
+              id="login-link"
               >Đăng nhập</a
             >
           </div>
@@ -170,31 +183,24 @@
           <!-- Desktop Sidebar (d-none d-lg-block) - Uses custom fixed styling -->
           <div class="col-lg-2 d-none d-lg-block sidebar-fixed">
             <nav class="pt-4 px-3">
-              <h5 class="text-primary mb-3 fw-bold">Danh mục & Bộ lọc</h5>
-              <ul class="nav flex-column">
-                <li class="nav-item fw-bold text-secondary mb-2">Môn học</li>
-                <li class="nav-item mb-1">
-                  <a class="nav-link" href="./pages/math.html">Toán học</a>
-                </li>
-                <li class="nav-item mb-1">
-                  <a class="nav-link" href="./pages/english.html">Tiếng Anh</a>
-                </li>
-                <li class="nav-item mb-1">
-                  <a class="nav-link" href="./pages/van.html">Ngữ Văn</a>
-                </li>
+              <h5 class="text-primary mb-3 fw-bold">Môn học</h5>
+              <ul class="nav flex-column" id="subject-list-container">
+                <!-- Subjects will be dynamically loaded here -->
               </ul>
 
-              <div class="mt-4 pt-3 border-top">
+              <div class="mt-4 pt-3 border-top" id="signed-in-group">
                 <h5 class="text-primary mb-3 fw-bold">Khác</h5>
                 <ul class="nav flex-column">
                   <li class="nav-item mb-1">
-                    <a class="nav-link" href="./pages/chat.html">Hỏi AI</a>
+                    <a class="nav-link" href="#" id="chat-link">Hỏi AI</a>
                   </li>
                   <li class="nav-item mb-1">
-                    <a class="nav-link" href="./pages/account.html">Tài khoản của tôi</a>
+                    <a class="nav-link" href="#" id="account-link"
+                      >Lịch sử mua tài liệu</a
+                    >
                   </li>
                   <li class="nav-item mb-1">
-                    <a class="nav-link" href="../pages/add.html">Thêm tài liệu</a>
+                    <a class="nav-link" href="#" id="coin-link">Nạp coin</a>
                   </li>
                 </ul>
               </div>
@@ -204,152 +210,14 @@
           <!-- Main Content Area - Pushed over by custom CSS on desktop -->
           <div class="col-12 col-lg-10 main-content-area">
             <h2 class="mt-4 mb-5 text-primary fw-bold border-bottom pb-2">
-              Danh sách Tài liệu Nổi bật
+              Danh sách Tài liệu
             </h2>
 
             <div
               class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4"
               id="document-list"
             >
-              <!-- Document Card 1 -->
-              <div class="col">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <h5 class="card-title text-success fw-bold">
-                      Tài liệu Toán ôn thi vào 10 cấp tốc (ID: 102)
-                    </h5>
-                    <p class="card-text text-muted mb-3">
-                      Giá: 120.000 VNĐ | Tác giả: Đức Anh
-                    </p>
-                    <div
-                      class="d-flex justify-content-between align-items-center"
-                    >
-                      <button
-                        class="btn btn-sm btn-info text-white rounded-pill px-3"
-                      >
-                        <i class="bi bi-cart"></i> Mua (120K)
-                      </button>
-                      <div>
-                        <button
-                          class="btn btn-sm btn-outline-danger me-2 rounded-pill"
-                        >
-                          <i class="bi bi-heart"></i>
-                        </button>
-                        <button
-                          class="btn btn-sm btn-outline-secondary rounded-pill"
-                        >
-                          <i class="bi bi-chat-dots"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Document Card 2 -->
-              <div class="col">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <h5 class="card-title text-success fw-bold">
-                      Tài liệu Tiếng Anh ôn thi vào 10 cấp tốc (ID: 201)
-                    </h5>
-                    <p class="card-text text-muted mb-3">
-                      Giá: 80.000 VNĐ | Tác giả: Đức Anh
-                    </p>
-                    <div
-                      class="d-flex justify-content-between align-items-center"
-                    >
-                      <button
-                        class="btn btn-sm btn-info text-white rounded-pill px-3"
-                      >
-                        <i class="bi bi-cart"></i> Mua (80K)
-                      </button>
-                      <div>
-                        <button
-                          class="btn btn-sm btn-outline-danger me-2 rounded-pill"
-                        >
-                          <i class="bi bi-heart"></i>
-                        </button>
-                        <button
-                          class="btn btn-sm btn-outline-secondary rounded-pill"
-                        >
-                          <i class="bi bi-chat-dots"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <!-- Document Card 3 -->
-              <div class="col">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <h5 class="card-title text-success fw-bold">
-                      Tài liệu Ngữ Văn ôn thi vào 10 cấp tốc (ID: 300)
-                    </h5>
-                    <p class="card-text text-muted mb-3">
-                      Giá: 100.000 VNĐ | Tác giả: Đức Anh
-                    </p>
-                    <div
-                      class="d-flex justify-content-between align-items-center"
-                    >
-                      <button
-                        class="btn btn-sm btn-info text-white rounded-pill px-3"
-                      >
-                        <i class="bi bi-cart"></i> Mua (100K)
-                      </button>
-                      <div>
-                        <button
-                          class="btn btn-sm btn-outline-danger me-2 rounded-pill"
-                        >
-                          <i class="bi bi-heart"></i>
-                        </button>
-                        <button
-                          class="btn btn-sm btn-outline-secondary rounded-pill"
-                        >
-                          <i class="bi bi-chat-dots"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Document Card 4 -->
-              <div class="col">
-                <div class="card shadow border-0">
-                  <div class="card-body">
-                    <h5 class="card-title text-success fw-bold">
-                      Tài liệu Tổng hợp KHTN ôn thi vào 10 (ID: 400)
-                    </h5>
-                    <!-- Fixed: Corrected the price discrepancy (500k vs 150k in button) to 150k for consistency -->
-                    <p class="card-text text-muted mb-3">
-                      Giá: 150.000 VNĐ | Tác giả: Đức Anh
-                    </p>
-                    <div
-                      class="d-flex justify-content-between align-items-center"
-                    >
-                      <button
-                        class="btn btn-sm btn-info text-white rounded-pill px-3"
-                      >
-                        <i class="bi bi-cart"></i> Mua (150K)
-                      </button>
-                      <div>
-                        <button
-                          class="btn btn-sm btn-outline-danger me-2 rounded-pill"
-                        >
-                          <i class="bi bi-heart"></i>
-                        </button>
-                        <button
-                          class="btn btn-sm btn-outline-secondary rounded-pill"
-                        >
-                          <i class="bi bi-chat-dots"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <!-- Document cards will be dynamically loaded here -->
             </div>
           </div>
         </div>
@@ -368,13 +236,14 @@
     </footer>
 
     <!-- Bootstrap JavaScript Bundle -->
+
     <script
-      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
       crossorigin="anonymous"
     ></script>
 
-    <script src="./js/nav.js"></script>
-    <script src="./js/search.js"></script>
+    <script type="module" src="./js/nav.js"></script>
+    <script type="module" src="./js/index.js"></script>
   </body>
-
 </html>

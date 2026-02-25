@@ -14,6 +14,7 @@ import {
   doc,
   updateDoc,
   arrayUnion,
+  arrayRemove,
 } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 // ======================
 // 🛠 CÁC HÀM HỖ TRỢ (HELPER FUNCTIONS)
@@ -71,7 +72,7 @@ document
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       const user = userCredential.user;
 
@@ -90,7 +91,7 @@ document
       e.target.reset();
       // Logic chuyển tab Bootstrap (giữ nguyên)
       const tabTrigger = new bootstrap.Tab(
-        document.querySelector("#signin-tab")
+        document.querySelector("#signin-tab"),
       );
       tabTrigger.show();
     } catch (error) {
@@ -123,7 +124,7 @@ document
       const userCredential = await signInWithEmailAndPassword(
         auth,
         email,
-        password
+        password,
       );
       const user = userCredential.user;
 
@@ -144,7 +145,7 @@ document
         window.location.href = "../index.html";
       } else {
         alert(
-          "⚠️ Đăng nhập thành công nhưng không tìm thấy dữ liệu người dùng!"
+          "⚠️ Đăng nhập thành công nhưng không tìm thấy dữ liệu người dùng!",
         );
       }
     } catch (error) {
@@ -164,39 +165,6 @@ document
 // ======================
 // 🛒 HÀM THÊM LỊCH SỬ MUA TÀI LIỆU
 // ======================
-
-async function addPurchase(docId, status = "Đã mua") {
-  // Lấy user hiện tại từ Firebase Auth (đáng tin cậy hơn localStorage)
-  const currentUser = auth.currentUser;
-
-  if (!currentUser) {
-    alert("⚠️ Vui lòng đăng nhập trước khi mua tài liệu!");
-    // Có thể redirect về trang login
-    return;
-  }
-
-  try {
-    const userRef = doc(db, "users", currentUser.uid);
-
-    // Sử dụng arrayUnion để thêm vào mảng mà không bị ghi đè dữ liệu cũ
-    await updateDoc(userRef, {
-      purchaseHistory: arrayUnion({
-        id: docId,
-        status: status,
-        purchasedAt: new Date(),
-      }),
-    });
-
-    alert(`🧾 Đã thêm tài liệu ${docId} vào lịch sử mua.`);
-
-    // Nếu bạn đang dùng localStorage để hiển thị UI, hãy cập nhật lại nó (tùy chọn)
-    // Lưu ý: Cách tốt nhất là listen snapshot từ Firestore realtime.
-  } catch (error) {
-    console.error("Lỗi mua hàng:", error);
-    alert("❌ Không thể lưu lịch sử mua: " + error.message);
-  }
-}
-
 // (Tùy chọn) Theo dõi trạng thái đăng nhập toàn cục
 // Giúp giữ trạng thái đăng nhập khi F5 trang
 onAuthStateChanged(auth, async (user) => {
@@ -207,3 +175,68 @@ onAuthStateChanged(auth, async (user) => {
     console.log("Chưa có user đăng nhập");
   }
 });
+
+// ======================
+// 🛒 BUY DOCUMENT (CREATE/UPDATE)
+// ======================
+async function addPurchase(docId, price, title) {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return alert("⚠️ Vui lòng đăng nhập!");
+
+  try {
+    const userRef = doc(db, "users", currentUser.uid);
+    const newPurchase = {
+      id: docId,
+      title: title,
+      price: price,
+      status: "Đã mua",
+      purchasedAt: new Date(), // Store as JS Date (Firestore converts to Timestamp)
+    };
+
+    await updateDoc(userRef, {
+      purchaseHistory: arrayUnion(newPurchase),
+    });
+
+    alert(`🧾 Đã mua tài liệu: ${title}`);
+  } catch (error) {
+    console.error("Lỗi mua hàng:", error);
+  }
+}
+
+// ======================
+// ❌ REMOVE OR CANCEL ORDER (DELETE/EDIT)
+// ======================
+async function manageOrder(purchaseItem, action = "remove") {
+  const currentUser = auth.currentUser;
+  if (!currentUser) return;
+
+  const userRef = doc(db, "users", currentUser.uid);
+
+  // Convert Firestore Timestamp to Date for comparison
+  const purchasedAt = purchaseItem.purchasedAt.toDate
+    ? purchaseItem.purchasedAt.toDate()
+    : new Date(purchaseItem.purchasedAt);
+  const now = new Date();
+  const diffInHours = (now - purchasedAt) / (1000 * 60 * 60);
+
+  if (action === "cancel" && diffInHours > 24) {
+    alert("⚠️ Đã quá 24h, bạn không thể hủy hoặc thay đổi đơn hàng này.");
+    return;
+  }
+
+  try {
+    // To 'edit', we remove the old and add the updated version
+    await updateDoc(userRef, {
+      purchaseHistory: arrayRemove(purchaseItem),
+    });
+
+    if (action === "remove") {
+      alert("🗑️ Đã xóa đơn hàng khỏi lịch sử.");
+    } else {
+      alert("✅ Đã hủy đơn hàng thành công (trong vòng 24h).");
+    }
+    // Refresh UI logic here
+  } catch (error) {
+    console.error("Lỗi xử lý đơn hàng:", error);
+  }
+}

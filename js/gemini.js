@@ -4,6 +4,16 @@
 let chatHistory = []; // Lưu lịch sử hội thoại (user và bot)
 let isGenerating = false; // Cờ kiểm tra xem bot đang trả lời hay không
 
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+
+// --- CHẶN TRUY CẬP ---
+onAuthStateChanged(auth, (user) => {
+    if (!user) {
+        alert("Bạn cần đăng nhập để sử dụng Chat AI!");
+        window.location.href = "login.html"; // Đường dẫn đến trang login của bạn
+    }
+});
+
 // Các phần tử giao diện
 const CHAT_WINDOW = document.getElementById("chat-window");
 const USER_INPUT = document.getElementById("user-input");
