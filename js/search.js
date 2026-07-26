@@ -1,25 +1,20 @@
-const searchInput = document.querySelector("#searchInput");
-const cards = document.querySelectorAll("#document-list .col");
+import { renderDocuments } from "./index.js";
 
-searchInput.addEventListener("input", () => {
-  const keyword = searchInput.value.toLowerCase();
+// Hàm lấy keyword từ URL
+function getKeywordFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("keyword") || "";
+}
 
-  cards.forEach(card => {
-    const title = card
-      .querySelector(".card-title")
-      .textContent
-      .toLowerCase();
+// lay subject tu url
+function getSubjectFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("subject") || "Tất cả";
+}
 
-    const description = card
-      .querySelector(".card-text")
-      .textContent
-      .toLowerCase();
-
-    // search theo title + mô tả
-    if (title.includes(keyword) || description.includes(keyword)) {
-      card.style.display = "block";
-    } else {
-      card.style.display = "none";
-    }
-  });
+// Khi trang được tải, hiển thị tài liệu dựa trên subject và keyword
+document.addEventListener("DOMContentLoaded", () => {
+  const subject = getSubjectFromURL();
+  const keyword = getKeywordFromURL();
+  renderDocuments(keyword, subject);
 });

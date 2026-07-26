@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nạp Coin - Study9+</title>
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
+    />
+
+    <style>
+      :root {
+        --study-blue: #0d6efd; /* Màu xanh thương hiệu Study9+ */
+        --study-orange: #ff9800;
+        --navbar-height: 60px;
+      }
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f4f7fe;
+        padding-bottom: 100px;
+      }
+
+      /* Sections */
+      .section-container {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 20px;
+        border: 1px solid #e0e6ed;
+      }
+      .section-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        color: #2c3e50;
+      }
+      .section-number {
+        background: var(--study-blue);
+        color: white;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        margin-right: 12px;
+        font-size: 0.85rem;
+      }
+
+      /* Mệnh giá Coin */
+      .recharge-card {
+        border: 2px solid #edf2f7;
+        border-radius: 12px;
+        padding: 15px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        background: #fff;
+      }
+      .recharge-card:hover {
+        border-color: var(--study-blue);
+        transform: translateY(-2px);
+      }
+      .recharge-card.active {
+        border-color: var(--study-blue);
+        background-color: #f0f7ff;
+      }
+      .recharge-card .amount {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #333;
+      }
+      .recharge-card .coin-value {
+        font-size: 0.9rem;
+        color: var(--study-orange);
+        font-weight: 600;
+        margin-top: 5px;
+      }
+
+      /* Thanh toán */
+      .payment-card {
+        border: 2px solid #edf2f7;
+        border-radius: 12px;
+        padding: 15px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        transition: all 0.2s;
+        height: 100%;
+        position: relative;
+      }
+      .payment-card:hover {
+        border-color: var(--study-blue);
+      }
+      .payment-card.active {
+        border-color: var(--study-blue);
+        background: #f0f7ff;
+      }
+      .payment-icon {
+        font-size: 1.8rem;
+        margin-right: 15px;
+      }
+
+      /* Sticky Bar */
+      .sticky-payment-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        padding: 15px;
+        border-top: 1px solid #e0e6ed;
+        z-index: 999;
+        box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+      }
+
+      /* Modal Custom */
+      .modal-content {
+        border-radius: 20px;
+        border: none;
+        overflow: hidden;
+      }
+      .modal-header-study {
+        background: var(--study-blue);
+        color: white;
+        padding: 20px;
+      }
+      .qr-box {
+        background: #fff;
+        border: 2px dashed #cbd5e0;
+        padding: 20px;
+        border-radius: 15px;
+        display: inline-block;
+      }
+    </style>
+    <style>
+      /* Define variables for fixed elements */
+      :root {
+        --navbar-height: 56px; /* Standard Bootstrap navbar height */
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f4f6f9; /* Light, soft background */
+      }
+
+      /* 1. Main content container must clear the fixed navbar */
+      .main-layout-container {
+        padding-top: calc(var(--navbar-height) + 1.5rem);
+      }
+
+      /* 2. Fixed Sidebar for large screens (Lg and up) */
+      @media (min-width: 992px) {
+        .sidebar-fixed {
+          height: calc(
+            100vh - var(--navbar-height)
+          ); /* Full height below the navbar */
+          position: fixed;
+          top: var(--navbar-height);
+          left: 0;
+          z-index: 1020;
+          overflow-y: auto;
+          background-color: #ffffff;
+          border-right: 1px solid #e9ecef;
+          padding-right: 0 !important;
+        }
+
+        /* 3. Push the main content area to the right to accommodate the fixed sidebar (col-lg-2 = 16.666%) */
+        .main-content-area,
+        .sticky-payment-bar {
+          margin-left: 16.666%; /* Matches the width of col-lg-2 */
+        }
+      }
+
+      /* Card Hover Effect */
+      .card {
+        border-radius: 0.75rem;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.1) !important;
+      }
+
+      .nav-link {
+        color: #343a40 !important; /* Ensure visibility on light sidebar background */
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+      }
+      .nav-link:hover {
+        color: #0d6efd !important;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav
+        class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top shadow"
+      >
+        <div class="container-fluid">
+          <!-- Toggle button for mobile sidebar -->
+          <button
+            class="btn btn-outline-light d-lg-none me-2"
+            type="button"
+            data-bs-toggle="offcanvas"
+            data-bs-target="#sidebarOffcanvas"
+            aria-controls="sidebarOffcanvas"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <a class="navbar-brand fw-bold" href="#" id="home-link">
+            <i class="bi bi-mortarboard-fill"></i> Study 9+
+          </a>
+
+          <!-- Fixed: Corrected the typo in style attribute -->
+          <form
+            class="d-flex mx-auto d-none d-md-flex"
+            style="width: 400px"
+            id="search-form"
+          >
+            <input
+              class="form-control me-2 rounded-pill"
+              type="search"
+              placeholder="Tìm kiếm tài liệu, khóa học..."
+              aria-label="Search"
+            />
+            <button class="btn btn-warning rounded-pill" type="submit">
+              Tìm
+            </button>
+          </form>
+
+          <div class="d-flex ms-auto">
+            <a
+              href="./pages/account.html"
+              class="btn btn-outline-light me-2 d-none rounded-pill"
+              id="logout-link"
+              >abc@gmail.com</a
+            >
+            <a
+              href="./pages/login.html"
+              class="btn btn-warning rounded-pill"
+              id="login-link"
+              >Đăng nhập</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main class="main-layout-container" style="min-height: 100vh">
+      <div class="container-fluid">
+        <div class="row">
+          <!-- Desktop Sidebar (d-none d-lg-block) - Uses custom fixed styling -->
+          <div class="col-lg-2 d-none d-lg-block sidebar-fixed">
+            <nav class="pt-4 px-3">
+              <h5 class="text-primary mb-3 fw-bold">Môn học</h5>
+              <ul class="nav flex-column" id="subject-list-container">
+                <!-- Subjects will be dynamically loaded here -->
+              </ul>
+
+              <div class="mt-4 pt-3 border-top" id="signed-in-group">
+                <h5 class="text-primary mb-3 fw-bold">Khác</h5>
+                <ul class="nav flex-column">
+                  <li class="nav-item mb-1">
+                    <a class="nav-link" href="#" id="chat-link">Hỏi AI</a>
+                  </li>
+                  <li class="nav-item mb-1">
+                    <a class="nav-link" href="#" id="account-link"
+                      >Lịch sử mua tài liệu</a
+                    >
+                  </li>
+                  <li class="nav-item mb-1">
+                    <a class="nav-link" href="#" id="coin-link">Nạp coin</a>
+                  </li>
+                </ul>
+              </div>
+            </nav>
+          </div>
+
+          <!-- Main Content Area - Pushed over by custom CSS on desktop -->
+          <div class="col-12 col-lg-10 main-content-area">
+            <h2 class="mt-4 mb-5 text-primary fw-bold border-bottom pb-2">
+              Nạp Coin - Tăng cường trải nghiệm học tập của bạn
+            </h2>
+
+            <div class="row g-4 px-2 d-flex flex-column">
+              <div class="section-container">
+                <div class="d-flex align-items-center">
+                  <i class="bi bi-coin text-warning fs-1 me-3"></i>
+                  <div>
+                    <div class="text-muted small">Số Coin bạn đang có</div>
+                    <div class="fw-bold text-primary fs-4" id="current-coin">
+                      --- Coin
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="section-container">
+                <h3 class="section-title">
+                  <span class="section-number">1</span> Chọn gói nạp Coin
+                </h3>
+                <div class="row g-3" id="coin-package-container">
+                  <!-- Coin packages will be dynamically loaded here -->
+                </div>
+              </div>
+
+              <div class="section-container">
+                <h3 class="section-title">
+                  <span class="section-number">2</span> Phương thức thanh toán
+                </h3>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <div
+                      class="payment-card shadow-sm active"
+                      onclick="selectPT(this, 'qr', 'Chuyển khoản / QR Pay')"
+                    >
+                      <i class="bi bi-qr-code payment-icon text-primary"></i>
+                      <div>
+                        <div class="fw-bold">Quét mã QR</div>
+                        <div class="text-muted small">
+                          Ngân hàng, Ví điện tử
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div
+                      class="payment-card shadow-sm"
+                      onclick="selectPT(this, 'card', 'Thẻ Visa/MasterCard')"
+                    >
+                      <i
+                        class="bi bi-credit-card-2-back payment-icon text-success"
+                      ></i>
+                      <div>
+                        <div class="fw-bold">Thẻ Quốc tế</div>
+                        <div class="text-muted small">
+                          Visa, Mastercard, JCB
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <div class="sticky-payment-bar">
+      <div class="container d-flex justify-content-between align-items-center">
+        <div>
+          <span class="text-muted d-none d-md-inline">Bạn đang nạp: </span>
+          <span class="fw-bold text-primary fs-5" id="summary-coin"
+            >0 Coin</span
+          >
+        </div>
+        <div class="d-flex align-items-center">
+          <div class="me-4 text-end">
+            <div class="text-muted small">Thanh toán:</div>
+            <div class="text-dark fw-bold fs-5" id="total-money">00.000 đ</div>
+          </div>
+          <button
+            class="btn btn-primary px-5 py-2 fw-bold rounded-pill shadow"
+            onclick="startNạp()"
+          >
+            Xác nhận nạp ngay
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modalQR" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center">
+          <div class="modal-header-study">
+            <h5 class="m-0 fw-bold">
+              <i class="bi bi-qr-code-scan me-2"></i>Quét mã QR nạp Coin
+            </h5>
+          </div>
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <p class="mb-1">Tài khoản nạp: <b>Học viên Study9+</b></p>
+              <p class="mb-0 text-primary fw-bold fs-4" id="modal-price">
+                50.000 đ
+              </p>
+            </div>
+
+            <div class="qr-box mb-3">
+              <img
+                src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=Study9Plus-NapCoin-50k"
+                width="180"
+              />
+            </div>
+
+            <p class="small text-muted mb-4">
+              Mã QR này dùng để nạp
+              <b><span id="modal-coin">550</span> Coin</b> vào hệ thống Study9+.
+            </p>
+
+            <button
+              class="btn btn-outline-secondary w-100 mb-2"
+              data-bs-dismiss="modal"
+            >
+              Hủy giao dịch
+            </button>
+            <button
+              class="btn btn-primary w-100 fw-bold py-2"
+              onclick="alert('Hệ thống đang kiểm tra giao dịch!')"
+            >
+              TÔI ĐÃ CHUYỂN KHOẢN
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="modalCard" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header border-bottom">
+            <h5 class="modal-title fw-bold text-primary">
+              Nhập thông tin thẻ quốc tế
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body p-4">
+            <div class="mb-3">
+              <label class="form-label small fw-bold"
+                >SỐ THẺ (CARD NUMBER)</label
+              >
+              <input
+                type="text"
+                class="form-control form-control-lg"
+                placeholder="xxxx xxxx xxxx xxxx"
+              />
+            </div>
+            <div class="row mb-4">
+              <div class="col-7">
+                <label class="form-label small fw-bold">HẾT HẠN (EXP)</label>
+                <input type="text" class="form-control" placeholder="MM/YY" />
+              </div>
+              <div class="col-5">
+                <label class="form-label small fw-bold">MÃ CVC</label>
+                <input type="password" class="form-control" placeholder="***" />
+              </div>
+            </div>
+            <button class="btn btn-primary w-100 fw-bold py-3 shadow">
+              THANH TOÁN AN TOÀN
+            </button>
+            <div class="text-center mt-3">
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg"
+                height="15"
+                class="me-2"
+              />
+              <img
+                src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg"
+                height="20"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module" src="../js/nav.js"></script>
+    <script type="module" src="../js/coin.js"></script>
+  </body>
+</html>
