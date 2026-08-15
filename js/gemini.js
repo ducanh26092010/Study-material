@@ -12,12 +12,12 @@ import {
 // CẤU HÌNH FIREBASE
 // ==============================
 const firebaseConfig = {
-  apiKey: "AIzaSyC7B3sV-09tvWQGCQTVhmjXpdGqc8JjQKg",
+  apiKey: "",
   authDomain: "jsi40-d42b6.firebaseapp.com",
   projectId: "jsi40-d42b6",
   storageBucket: "jsi40-d42b6.firebasestorage.app",
   messagingSenderId: "1088752303047",
-  appId: "1:1088752303047:web:db382f20953ef72de4f7e2",
+  appId: "1:1088752303047:web:8ca13c16f8038148e4f7e2",
 };
 
 // Khởi tạo Firebase & Firestore
