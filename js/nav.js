@@ -1,6 +1,6 @@
 import { auth } from "./firebase-config.js";
 import { subjects } from "./data.js";
-import { signOut } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { signOut } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 // ------------------------------------
 // lấy các nút bấm cần thêm chức năng

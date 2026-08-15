@@ -7,7 +7,7 @@ import {
   addDoc,
   collection,
   serverTimestamp,
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { subjects, DOCUMENT_DATA } from "./data.js";
 
 // 1. Hiển thị tài liệu và Filter

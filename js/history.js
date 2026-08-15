@@ -9,7 +9,7 @@ import {
   Timestamp,
   getDoc,
   increment,
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 
 const WAIT_TIMES = 2 * 60 * 1000;
 

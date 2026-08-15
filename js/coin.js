@@ -8,9 +8,9 @@ import {
   increment,
   getDoc,
   onSnapshot,
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 import { coinPackages } from "./data.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 
 let selectedPackage = coinPackages[1];
 let paymentMethod = "qr";

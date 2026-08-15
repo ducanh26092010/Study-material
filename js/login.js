@@ -3,7 +3,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   onAuthStateChanged, // Để theo dõi trạng thái đăng nhập
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-auth.js";
 import {
   collection,
   query,
@@ -15,7 +15,7 @@ import {
   updateDoc,
   arrayUnion,
   arrayRemove,
-} from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/12.17.1/firebase-firestore.js";
 // ======================
 // 🛠 CÁC HÀM HỖ TRỢ (HELPER FUNCTIONS)
 // ======================
