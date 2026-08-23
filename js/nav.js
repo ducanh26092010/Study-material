@@ -55,7 +55,11 @@ document.addEventListener("DOMContentLoaded", async () => {
       logoutBtn.classList.remove("d-none");
       logoutBtn.innerText = user.email;
       logoutBtn.onclick = () => {
-        if (confirm("Đăng xuất?")) signOut(auth);
+        if (confirm("Đăng xuất?")) {
+          signOut(auth);
+          localStorage.removeItem("currentUser");
+          window.location.href = "../index.html";
+        }
       };
       // hien phan signed-in-group
       signedInGroup?.classList.remove("d-none");
@@ -93,6 +97,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // chuyen toi trang search voi query param la keyword
-    window.location.href = `./search.html?keyword=${encodeURIComponent(keyword)}`;
+    window.location.href = `../pages/search.html?keyword=${encodeURIComponent(keyword)}`;
   });
 });

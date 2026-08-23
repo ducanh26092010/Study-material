@@ -75,7 +75,7 @@ window.buyDoc = async function (docId, title, price) {
 
   if (!user) {
     alert("Bạn cần đăng nhập!");
-    location.href = "./pages/login.html";
+    location.href = "../pages/login.html";
     return;
   }
 
@@ -90,7 +90,7 @@ window.buyDoc = async function (docId, title, price) {
     ========================= */
     if (currentCoin < price) {
       alert("Không đủ coin. Hãy nạp thêm coin!");
-      location.href = "./pages/coin.html";
+      location.href = "../pages/coin.html";
       return;
     }
 
