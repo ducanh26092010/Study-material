@@ -37,7 +37,7 @@ if (!sessionId) {
 let chatHistory = [];
 let isGenerating = false;
 
-const GEMINI_API_KEY = "AQ.Ab8RN6LHPbDLq_4sBXx8BN1z5dRqy1Y7xDC-F6d2NEdNWqWgSw"; 
+const GEMINI_API_KEY = ""; 
 const MODEL_NAME = "gemini-3.1-flash-lite"; 
 const CHAT_WINDOW = document.getElementById("chat-window");
 const USER_INPUT = document.getElementById("user-input");
