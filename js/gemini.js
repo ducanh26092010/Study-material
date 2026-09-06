@@ -12,7 +12,7 @@ import {
 // CẤU HÌNH FIREBASE
 // ==============================
 const firebaseConfig = {
-  apiKey: "",
+  apiKey: "AIzaSyDb7gA13iZ_1Tom8zaIWRtfJoYrjSzMfw0",
   authDomain: "jsi40-d42b6.firebaseapp.com",
   projectId: "jsi40-d42b6",
   storageBucket: "jsi40-d42b6.firebasestorage.app",
@@ -38,7 +38,7 @@ let chatHistory = [];
 let isGenerating = false;
 
 const GEMINI_API_KEY = ""; 
-const MODEL_NAME = "gemini-flash-latest"; 
+const MODEL_NAME = "gemini-3.1-flash-lite"; 
 const CHAT_WINDOW = document.getElementById("chat-window");
 const USER_INPUT = document.getElementById("user-input");
 const SEND_BUTTON = document.getElementById("send-button");
@@ -80,7 +80,7 @@ async function saveMessageToFirebase(sender, text) {
   try {
     await addDoc(collection(db, "chat_messages"), {
       sessionId: sessionId,
-      sender: sender, // "user" hoặc "bot"
+      sender: sender, 
       text: text,
       createdAt: Date.now()
     });
